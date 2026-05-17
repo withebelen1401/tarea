@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Programador Comelón NY</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a3f 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            background: rgba(20, 20, 40, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 150, 255, 0.3), 0 0 40px rgba(100, 200, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        /* PANTALLA INICIAL */
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* INICIO */
+        .start-screen {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+        }
+
+        .game-title {
+            font-size: 3.5em;
+            font-weight: 900;
+            background: linear-gradient(135deg, #64c8ff 0%, #00b8ff 50%, #0099ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(100, 200, 255, 0.3);
+            letter-spacing: 2px;
+            animation: glow 2s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                filter: drop-shadow(0 0 10px rgba(100, 200, 255, 0.3));
+            }
+            50% {
+                filter: drop-shadow(0 0 25px rgba(100, 200, 255, 0.6));
+            }
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #64c8ff;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        label {
+            text-align: left;
+            font-size: 1.1em;
+            color: #00b8ff;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input[type="text"],
+        select {
+            padding: 15px 20px;
+            border: 2px solid #00b8ff;
+            background: rgba(0, 184, 255, 0.1);
+            color: #ffffff;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #64c8ff;
+            background: rgba(100, 200, 255, 0.15);
+            box-shadow: 0 0 20px rgba(100, 200, 255, 0.3);
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(100, 200, 255, 0.5);
+        }
+
+        select option {
+            background: #0f0f1e;
+            color: #ffffff;
+        }
+
+        .button {
+            padding: 15px 40px;
+            border: none;
+            background: linear-gradient(135deg, #00b8ff 0%, #0099ff 100%);
+            color: #ffffff;
+            font-size: 1.1em;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 30px rgba(0, 184, 255, 0.4);
+            margin-top: 20px;
+        }
+
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(100, 200, 255, 0.6);
+        }
+
+        .button:active {
+            transform: translateY(-1px);
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* PANTALLA DEL JUEGO */
+        .game-screen {
+            display: none;
+        }
+
+        .game-screen.active {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            min-height: 600px;
+        }
+
+        .game-left {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .canvas-container {
+            background: rgba(0, 20, 50, 0.8);
+            border: 2px solid #00b8ff;
+            border-radius: 15px;
+            padding: 10px;
+            box-shadow: 0 0 20px rgba(0, 184, 255, 0.2);
+        }
+
+        canvas {
+            display: block;
+            background: #000;
+            border-radius: 10px;
+            width: 100%;
+            height: auto;
+        }
+
+        .game-info-mini {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.9em;
+        }
+
+        .info-box-mini {
+            background: rgba(0, 184, 255, 0.1);
+            border: 1px solid #00b8ff;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .info-label-mini {
+            color: #64c8ff;
+            font-size: 0.8em;
+            text-transform: uppercase;
+        }
+
+        .info-value-mini {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .game-right {
+            background: rgba(0, 184, 255, 0.05);
+            border: 2px solid #00b8ff;
+            border-radius: 15px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .player-info {
+            text-align: center;
+            border-bottom: 2px solid rgba(100, 200, 255, 0.2);
+            padding-bottom: 20px;
+        }
+
+        .player-name {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #64c8ff;
+            margin-bottom: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: rgba(0, 150, 255, 0.15);
+            border: 1px solid #0099ff;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            background: rgba(100, 200, 255, 0.25);
+            border-color: #64c8ff;
+            transform: translateY(-2px);
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #64c8ff;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .question-section {
+            flex: 1;
+        }
+
+        .question-header {
+            font-size: 0.9em;
+            color: #00b8ff;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            background: rgba(0, 150, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #00b8ff;
+        }
+
+        .answers-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .answer-button {
+            padding: 12px 15px;
+            border: 2px solid #0099ff;
+            background: rgba(0, 150, 255, 0.1);
+            color: #ffffff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-size: 0.95em;
+            font-weight: 500;
+        }
+
+        .answer-button:hover:not(:disabled) {
+            background: rgba(100, 200, 255, 0.25);
+            border-color: #64c8ff;
+            transform: translateX(5px);
+        }
+
+        .answer-button:disabled {
+            cursor: not-allowed;
+        }
+
+        .answer-button.correct {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: #4caf50;
+            color: #4caf50;
+        }
+
+        .answer-button.incorrect {
+            background: rgba(244, 67, 54, 0.3);
+            border-color: #f44336;
+            color: #f44336;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.correct-feedback {
+            background: rgba(76, 175, 80, 0.2);
+            border-left: 4px solid #4caf50;
+            color: #a5d6a7;
+        }
+
+        .feedback.incorrect-feedback {
+            background: rgba(244, 67, 54, 0.2);
+            border-left: 4px solid #f44336;
+            color: #ef9a9a;
+        }
+
+        .next-button {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #00b8ff 0%, #0099ff 100%);
+            border: none;
+            color: #ffffff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        .next-button.show {
+            display: block;
+        }
+
+        .next-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 200, 255, 0.4);
+        }
+
+        /* GAME OVER */
+        .game-over-screen {
+            display: none;
+            text-align: center;
+            flex-direction: column;
+            gap: 30px;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+        }
+
+        .game-over-screen.active {
+            display: flex;
+        }
+
+        .game-over-title {
+            font-size: 4em;
+            font-weight: 900;
+            color: #f44336;
+            text-shadow: 0 0 30px rgba(244, 67, 54, 0.5);
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .final-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            font-size: 1.3em;
+            color: #64c8ff;
+            margin: 20px 0;
+        }
+
+        .final-stat {
+            background: rgba(0, 184, 255, 0.1);
+            padding: 15px 30px;
+            border-radius: 10px;
+            border-left: 4px solid #00b8ff;
+        }
+
+        .final-stat strong {
+            color: #ffffff;
+        }
+
+        .restart-button {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            border: none;
+            color: #ffffff;
+            font-size: 1.1em;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .restart-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(76, 175, 80, 0.6);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .game-screen.active {
+                grid-template-columns: 1fr;
+                min-height: auto;
+            }
+
+            .game-right {
+                max-height: 400px;
+            }
+
+            .game-title {
+                font-size: 2.5em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .game-title {
+                font-size: 2em;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+            }
+
+            .game-right {
+                max-height: none;
+            }
+        }
+
+        /* SCROLLBAR */
+        .game-right::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .game-right::-webkit-scrollbar-track {
+            background: rgba(0, 150, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .game-right::-webkit-scrollbar-thumb {
+            background: rgba(0, 184, 255, 0.4);
+            border-radius: 10px;
+        }
+
+        .game-right::-webkit-scrollbar-thumb:hover {
+            background: rgba(100, 200, 255, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- PANTALLA DE INICIO -->
+        <div class="screen start-screen active" id="startScreen">
+            <h1 class="game-title">🎮 EL PROGRAMADOR COMELÓN NY</h1>
+            <p class="subtitle">Aprende JavaScript jugando</p>
+
+            <div class="form-group">
+                <label for="playerName">Tu Nombre</label>
+                <input type="text" id="playerName" placeholder="Escribe tu nombre...">
+
+                <label for="difficulty">Dificultad</label>
+                <select id="difficulty">
+                    <option value="easy">Fácil</option>
+                    <option value="medium">Medio</option>
+                    <option value="hard">Difícil</option>
+                </select>
+
+                <button class="button" onclick="startGame()">JUGAR</button>
+            </div>
+        </div>
+
+        <!-- PANTALLA DEL JUEGO -->
+        <div class="screen game-screen" id="gameScreen">
+            <div class="game-left">
+                <div class="canvas-container">
+                    <canvas id="gameCanvas" width="400" height="400"></canvas>
+                </div>
+                <div class="game-info-mini">
+                    <div class="info-box-mini">
+                        <div class="info-label-mini">Puntaje</div>
+                        <div class="info-value-mini" id="scoreMini">0</div>
+                    </div>
+                    <div class="info-box-mini">
+                        <div class="info-label-mini">Vidas</div>
+                        <div class="info-value-mini" id="livesMini">3</div>
+                    </div>
+                    <div class="info-box-mini">
+                        <div class="info-label-mini">Nivel</div>
+                        <div class="info-value-mini" id="levelMini">1</div>
+                    </div>
+                    <div class="info-box-mini">
+                        <div class="info-label-mini">Preguntas</div>
+                        <div class="info-value-mini" id="questionsMini">0/5</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-right">
+                <div class="player-info">
+                    <div class="player-name" id="playerDisplayName">Jugador</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Puntaje</div>
+                            <div class="stat-value" id="scoreDisplay">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Vidas</div>
+                            <div class="stat-value" id="livesDisplay">3</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Nivel</div>
+                            <div class="stat-value" id="levelDisplay">1</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Aciertos</div>
+                            <div class="stat-value" id="correctDisplay">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-section">
+                    <div class="question-header" id="questionCount">Pregunta 1 de 5</div>
+                    <div class="question-text" id="questionText">Cargando pregunta...</div>
+                    <div class="answers-container" id="answersContainer">
+                        <!-- Se generan dinámicamente -->
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                    <button class="next-button" id="nextButton" onclick="nextQuestion()">Siguiente Pregunta</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANTALLA GAME OVER -->
+        <div class="screen game-over-screen" id="gameOverScreen">
+            <h1 class="game-over-title">💀 GAME OVER</h1>
+            <div class="final-stats">
+                <div class="final-stat">Jugador: <strong id="finalPlayerName">Jugador</strong></div>
+                <div class="final-stat">Puntaje Final: <strong id="finalScore">0</strong></div>
+                <div class="final-stat">Respuestas Correctas: <strong id="finalCorrect">0</strong></div>
+                <div class="final-stat">Nivel Alcanzado: <strong id="finalLevel">1</strong></div>
+            </div>
+            <button class="restart-button" onclick="restartGame()">Jugar de Nuevo</button>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
