@@ -177,7 +177,7 @@
 
         .game-screen.active {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 20px;
             min-height: 550px;
         }
@@ -231,7 +231,7 @@
             color: #0044aa;
         }
 
-        .game-right {
+        .game-middle {
             background: rgba(200, 235, 255, 0.4);
             border: 2px solid #0099cc;
             border-radius: 15px;
@@ -258,7 +258,7 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 8px;
             margin-bottom: 12px;
         }
@@ -299,6 +299,17 @@
             font-size: 0.8em;
             color: #0066aa;
             text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .topic-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #0099cc 0%, #0077aa 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
             margin-bottom: 8px;
             font-weight: 600;
         }
@@ -416,6 +427,68 @@
             box-shadow: 0 4px 12px rgba(0, 150, 200, 0.3);
         }
 
+        /* PANEL DE TEORÍA */
+        .game-right {
+            background: rgba(200, 235, 255, 0.4);
+            border: 2px solid #0099cc;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            max-height: 550px;
+        }
+
+        .theory-header {
+            font-size: 1em;
+            color: #0066aa;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 150, 200, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .theory-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .theory-item {
+            background: rgba(100, 200, 255, 0.15);
+            border-left: 4px solid #0099cc;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .theory-title {
+            font-size: 0.95em;
+            font-weight: 700;
+            color: #0077aa;
+            margin-bottom: 6px;
+        }
+
+        .theory-text {
+            font-size: 0.85em;
+            color: #1a3a4a;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 150, 200, 0.2);
+            padding: 8px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            color: #0044aa;
+            overflow-x: auto;
+            margin-top: 6px;
+        }
+
         /* GAME OVER */
         .game-over-screen {
             display: none;
@@ -495,7 +568,7 @@
                 min-height: auto;
             }
 
-            .game-right {
+            .game-middle, .game-right {
                 max-height: 400px;
             }
 
@@ -517,26 +590,30 @@
                 grid-template-columns: 1fr 1fr;
             }
 
-            .game-right {
+            .game-middle, .game-right {
                 max-height: none;
             }
         }
 
         /* SCROLLBAR */
+        .game-middle::-webkit-scrollbar,
         .game-right::-webkit-scrollbar {
             width: 6px;
         }
 
+        .game-middle::-webkit-scrollbar-track,
         .game-right::-webkit-scrollbar-track {
             background: rgba(0, 150, 200, 0.1);
             border-radius: 10px;
         }
 
+        .game-middle::-webkit-scrollbar-thumb,
         .game-right::-webkit-scrollbar-thumb {
             background: rgba(0, 150, 200, 0.3);
             border-radius: 10px;
         }
 
+        .game-middle::-webkit-scrollbar-thumb:hover,
         .game-right::-webkit-scrollbar-thumb:hover {
             background: rgba(0, 150, 200, 0.5);
         }
@@ -584,13 +661,13 @@
                         <div class="info-value-mini" id="levelMini">1</div>
                     </div>
                     <div class="info-box-mini">
-                        <div class="info-label-mini">Comidas</div>
+                        <div class="info-label-mini">Temas</div>
                         <div class="info-value-mini" id="questionsMini">0</div>
                     </div>
                 </div>
             </div>
 
-            <div class="game-right">
+            <div class="game-middle">
                 <div class="player-info">
                     <div class="player-name" id="playerDisplayName">Jugador</div>
                     <div class="stats-grid">
@@ -615,12 +692,20 @@
 
                 <div class="question-section">
                     <div class="question-header" id="questionCount">Pregunta 1</div>
+                    <div class="topic-badge" id="topicBadge">Variables</div>
                     <div class="question-text" id="questionText">Cargando pregunta...</div>
                     <div class="answers-container" id="answersContainer">
                         <!-- Se generan dinámicamente -->
                     </div>
                     <div class="feedback" id="feedback"></div>
                     <button class="next-button" id="nextButton" onclick="nextQuestion()">Siguiente</button>
+                </div>
+            </div>
+
+            <div class="game-right">
+                <div class="theory-header">📚 Teoría del Tema</div>
+                <div class="theory-content" id="theoryContent">
+                    <!-- Se genera dinámicamente -->
                 </div>
             </div>
         </div>
@@ -632,7 +717,7 @@
                 <div class="final-stat">Jugador: <strong id="finalPlayerName">Jugador</strong></div>
                 <div class="final-stat">Puntaje Final: <strong id="finalScore">0</strong></div>
                 <div class="final-stat">Respuestas Correctas: <strong id="finalCorrect">0</strong></div>
-                <div class="final-stat">Nivel Alcanzado: <strong id="finalLevel">1</strong></div>
+                <div class="final-stat">Temas Completados: <strong id="finalTopics">0</strong></div>
             </div>
             <button class="restart-button" onclick="restartGame()">Jugar de Nuevo</button>
         </div>
